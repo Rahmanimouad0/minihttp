@@ -1,0 +1,8 @@
+# Always check files out with Unix line endings, even on Windows: the project
+# is built and tested on Linux, where bash scripts and Makefiles break on CRLF.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>minihttp</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <img src="/logo.svg" alt="" width="56" height="56">
+      <div>
+        <h1>It works.</h1>
+        <p class="lead">This page was served by <strong>minihttp</strong>, a tiny HTTP/1.1 server
+          written in C with Linux sockets and POSIX threads.</p>
+      </div>
+    </header>
+
+    <h2>Try it</h2>
+    <ul>
+      <li><a href="/docs/"><code>/docs/</code></a> is a directory with its own <code>index.html</code></li>
+      <li><a href="/docs"><code>/docs</code></a> is the same directory without the slash, so you get a 301 redirect</li>
+      <li><a href="/style.css"><code>/style.css</code></a> is served as <code>text/css</code></li>
+      <li><a href="/does-not-exist.html"><code>/does-not-exist.html</code></a> gives 404 Not Found</li>
+    </ul>
+
+    <h2>From a terminal</h2>
+    <pre>curl -i http://localhost:8080/index.html
+curl -I http://localhost:8080/logo.svg
+curl -i --path-as-is http://localhost:8080/../etc/passwd
+printf 'BAD\r\n\r\n' | nc localhost 8080</pre>
+  </main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build (warnings are errors)
+        run: make CFLAGS="-O2 -g -Werror"
+
+      - name: Unit and end-to-end tests
+        run: make test
+
+  sanitizers:
+    name: Sanitizers (make ${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [sanitize, tsan]
+    steps:
+      - uses: actions/checkout@v5
+
+      # The sanitizers' shadow memory doesn't fit with the runner's default
+      # address-space randomization; lowering it is the standard workaround.
+      - name: Lower ASLR entropy
+        run: sudo sysctl vm.mmap_rnd_bits=28
+
+      - name: Build and test with sanitizers
+        run: make ${{ matrix.target }}

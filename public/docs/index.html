@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a request flows · minihttp</title>
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <p><a href="/">← back</a></p>
+    <h1>How a request flows</h1>
+    <ol class="flow">
+      <li><strong>TCP socket.</strong> <code>accept4()</code> hands the connection to a new thread.</li>
+      <li><strong>HTTP parser.</strong> It reads up to 8 KiB until the blank line, then checks the
+        request line and headers against RFC 9112.</li>
+      <li><strong>Request handler.</strong> It decodes and normalizes the path, then checks
+        with <code>realpath()</code> that the file is inside the document root.</li>
+      <li><strong>HTTP response.</strong> It writes the status line and headers, then streams the
+        body with <code>sendfile()</code>.</li>
+    </ol>
+    <p>You reached this page through <code>/docs/</code>, which the server mapped
+      to <code>docs/index.html</code>.</p>
+  </main>
+</body>
+</html>
