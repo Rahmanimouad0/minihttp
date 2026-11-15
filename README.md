@@ -1,5 +1,8 @@
 # minihttp
 
+[![CI](https://github.com/Rahmanimouad0/minihttp/actions/workflows/ci.yml/badge.svg)](https://github.com/Rahmanimouad0/minihttp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A tiny HTTP/1.1 static file server, written from scratch in C with Linux
 sockets and POSIX threads. It uses only libc: no frameworks and no event
 libraries. It's about 1,300 lines of C, including comments.
