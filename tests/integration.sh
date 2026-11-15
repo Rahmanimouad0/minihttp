@@ -35,7 +35,9 @@ check() {  # check NAME EXPECTED ACTUAL
 }
 
 start_server() {
-    "$BIN" --port "$PORT" --root "$ROOT" "$@" >"$LOG" 2>&1 &
+    # Append, so the output of every server run survives for the failure report.
+    echo "==== minihttp $* ====" >>"$LOG"
+    "$BIN" --port "$PORT" --root "$ROOT" "$@" >>"$LOG" 2>&1 &
     PID=$!
     for _ in $(seq 50); do
         curl -s -o /dev/null "$URL/" && return 0
@@ -163,10 +165,14 @@ stop_server INT
 elapsed_ms=$(( ($(date +%s%N) - started) / 1000000 ))
 exec 4<&-
 check "SIGINT -> exit status 0"         0 "$exit_status"
-check "idle client doesn't delay exit"  fast "$( ((elapsed_ms < 1000)) && echo fast || echo "${elapsed_ms} ms")"
+# Without SHUT_RD the idle thread would sit out its 5 s receive timeout. The
+# limit leaves room for ThreadSanitizer, which sleeps 1 s at exit whenever a
+# thread is still finishing.
+check "idle client doesn't delay exit"  fast "$( ((elapsed_ms < 3000)) && echo fast || echo "${elapsed_ms} ms")"
 
 echo "connection limit"
 start_server --max-clients 1
+sleep 0.3                               # let start_server's probe free the slot
 exec 4<>"/dev/tcp/127.0.0.1/$PORT"      # takes the only slot
 sleep 0.2
 check "over --max-clients -> 503"       503 "$(status_of "$URL/")"
@@ -177,4 +183,10 @@ stop_server TERM
 
 echo
 echo "integration tests: $pass passed, $fail failed"
+if ((fail > 0)); then
+    # Sanitizer reports go to the server's stderr: show them, or CI can't say why it failed.
+    echo
+    echo "---- server output ----"
+    cat "$LOG"
+fi
 ((fail == 0))
